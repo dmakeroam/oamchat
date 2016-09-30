@@ -1,0 +1,40 @@
+<html>
+<head>
+
+  <script src='http://localhost:9999/socket.io/socket.io.js'></script>
+  <script>
+   var socket = io.connect('http://localhost:9999')
+   var client = null
+   var clientOrigin = null
+   socket.on('broadcast', function (data) {
+       console.log('Servent sent: ' + data.msg)
+       var ct = document.getElementById('content');
+       client = data.client
+       if(data.msg === 'Hi'){
+          clientOrigin = client;
+       }
+       ct.innerHTML += 'client # '+data.client + ':' + data.msg + '<br/>'
+   })
+
+   function init(){
+    console.log('init...');
+    document.getElementById('btsend').onclick=function(){
+       console.log('clicked...');
+       var msg = document.getElementById("msg").value;
+       // OWN
+       var ct = document.getElementById('content');
+       ct.innerHTML += 'client # '+clientOrigin + ' : '+msg + '<br/>'
+       socket.emit('clientmsg',{client:clientOrigin, msg:msg})
+    }
+  }
+
+   window.onload=init;
+  </script>
+</head>
+
+<body>
+  Message: <input type="text" id="msg"/>
+           <input id="btsend" type="button" value="Send" />
+  <div id="content"></div>
+</body>
+</html>
